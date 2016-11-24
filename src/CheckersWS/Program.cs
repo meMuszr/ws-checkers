@@ -18,7 +18,6 @@ namespace CheckersWS
                 .UseIISIntegration()
                 .UseStartup<Startup>()
                 .Build();
-
             host.Run();
         }
     }
