@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91AA191D-287A-406D-968F-D281284263E5}"
 	ProjectSection(SolutionItems) = preProject
 		global.json = global.json
+		LICENSE = LICENSE
 	EndProjectSection
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CheckersWS", "src\CheckersWS\CheckersWS.xproj", "{6420EF15-1915-4762-A91C-633D7CBDB4CE}"
