@@ -8,19 +8,27 @@ namespace Checkers.Components
 {
     public class Board
     {
-        public readonly byte GRID_SIZE = 8;
-        public byte[,] Grid { get; private set; } = new byte[8, 8];
+        public static readonly byte GRID_SIZE = 8;
+        public byte?[,] Grid { get; private set; } = new byte?[8, 8];
         public void addToGrid(int x, int y, Player.EnumColor color, Piece.PieceType pieceType)
         {
-            if (Grid[y, x] == 0) Grid[y, x] = PieceInfoToByte(color, pieceType);
+            if (Grid[y, x] == null) Grid[y, x] = PieceInfoToByte(color, pieceType);
         }
         private byte PieceInfoToByte(Player.EnumColor color, Piece.PieceType pieceType) => byte.Parse($"{(int)color}{(int)pieceType}");
+
+        //TODO -
+        //Add conditional for if location is used / empty --done
+        //Add check for jumps
         public bool isMoveValid(Piece piece, Point newCoordinates)
         {
             if (piece == null) throw new ArgumentNullException();
+            if (newCoordinates == null) throw new ArgumentNullException();
+            if (getPieceInfo(newCoordinates.X, newCoordinates.Y) != null) return false;
             switch (piece.TypeOfPiece)
             {
-                case Piece.PieceType.Man: return (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) && piece.Location.Y + 1 == newCoordinates.Y;
+                case Piece.PieceType.Man:
+                    return (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) && 
+                           (piece.Location.Y + 1 == newCoordinates.Y);
                 case Piece.PieceType.King:
                     return (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
                            (piece.Location.Y + 1 == newCoordinates.Y || piece.Location.Y - 1 == newCoordinates.Y);
@@ -35,7 +43,7 @@ namespace Checkers.Components
                 for (int x = 0; x < GRID_SIZE; x++)
                 {
                     var value = Grid[y, x];
-                    if (value == 0) sb.Append("_");
+                    if (value == null) sb.Append("_");
                     else
                     {
                         var stringValue = Grid[y, x].ToString();
@@ -64,8 +72,8 @@ namespace Checkers.Components
 
         public Tuple<Player.EnumColor, Piece.PieceType> getPieceInfo(int x, int y)
         {
-            byte info = Grid[y, x];
-            if (info == 0) throw new KeyNotFoundException();
+            byte? info = Grid[y, x];
+            if (info == null) return null;
             else
             {
                 string data = $"{info}";

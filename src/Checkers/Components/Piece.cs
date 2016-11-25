@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Checkers.Components.Player;
 
 namespace Checkers.Components
 {
@@ -19,10 +20,29 @@ namespace Checkers.Components
             Location = point;
             TypeOfPiece = type;
         }
+        public static IEnumerable<Piece> createPieces(EnumColor color)
+        {
+            switch (color)
+            {
+                case EnumColor.White:
+                    for (byte y = 0; y < 3; y++)
+                        for (byte x = 0; x < Board.GRID_SIZE; x++)
+                            if (y % 2 == x % 2)
+                                yield return new Piece(new Point(x, y), Piece.PieceType.Man);
+                    break;
+                case EnumColor.Black:
+                    for (byte y = 5; y < Board.GRID_SIZE; y++)
+                        for (byte x = 0; x < Board.GRID_SIZE; x++)
+                            if (y % 2 == x % 2)
+                                yield return new Piece(new Point(x, y), Piece.PieceType.Man);
+                    break;
+            }
+        }
         public enum PieceType
         {
             Man = 1,
             King = 2
         }
+
     }
 }
