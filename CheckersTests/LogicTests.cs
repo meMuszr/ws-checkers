@@ -1,8 +1,4 @@
 ﻿using Checkers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace CheckersTests
@@ -13,6 +9,8 @@ namespace CheckersTests
         public void PassingTest()
         {
             var game = new Game();
+            var outstr = game.Board.PrettyPrint();
+
         }
 
     }
