@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Checkers.Components;
 namespace Checkers.Components
 {
     public class Board
     {
+        private static Dictionary<Direction, Func<bool, bool>> directionFunc = new Dictionary<Direction, Func<bool, bool>>();
+
+        static Board()
+        {
+        }
         public static readonly byte GRID_SIZE = 8;
         public byte?[,] Grid { get; private set; } = new byte?[8, 8];
         public void addToGrid(int x, int y, Player.EnumColor color, Piece.PieceType pieceType)
@@ -16,24 +21,37 @@ namespace Checkers.Components
         }
         private byte PieceInfoToByte(Player.EnumColor color, Piece.PieceType pieceType) => byte.Parse($"{(int)color}{(int)pieceType}");
 
+
         //TODO -
         //Add conditional for if location is used / empty --done
         //Add check for jumps
-        public bool isMoveValid(Piece piece, Point newCoordinates)
+
+        public Direction getMoveDirection(int dY, int dX)
         {
-            if (piece == null) throw new ArgumentNullException();
-            if (newCoordinates == null) throw new ArgumentNullException();
-            if (getPieceInfo(newCoordinates.X, newCoordinates.Y) != null) return false;
+            var location = Math.Atan2(dY, dX);
+            if (location > Math.PI / 2) return Direction.NW;
+            else if (location < -Math.PI / 2) return Direction.SW;
+            else if (location < 0) return Direction.SE;
+            else return Direction.NE;
+        }
+        private bool canMove(Piece piece, Point newCoordinates)
+        {
+            bool rtnBool = false;
             switch (piece.TypeOfPiece)
             {
                 case Piece.PieceType.Man:
-                    return (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) && 
-                           (piece.Location.Y + 1 == newCoordinates.Y);
+                    rtnBool |= (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
+                               (piece.Location.Y + 1 == newCoordinates.Y);
+                    break;
                 case Piece.PieceType.King:
-                    return (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
-                           (piece.Location.Y + 1 == newCoordinates.Y || piece.Location.Y - 1 == newCoordinates.Y);
-                default: return false;
+                    rtnBool |= (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
+                               (piece.Location.Y + 1 == newCoordinates.Y || piece.Location.Y - 1 == newCoordinates.Y);
+                    break;
+                default:
+                    rtnBool |= false;
+                    break;
             }
+            return rtnBool;
         }
         public string PrettyPrint()
         {
@@ -70,17 +88,10 @@ namespace Checkers.Components
             else return point;
         }
 
-        public Tuple<Player.EnumColor, Piece.PieceType> getPieceInfo(int x, int y)
+
+        public enum Direction
         {
-            byte? info = Grid[y, x];
-            if (info == null) return null;
-            else
-            {
-                string data = $"{info}";
-                Player.EnumColor color = (Player.EnumColor)int.Parse($"{data[0]}");
-                Piece.PieceType pieceType = (Piece.PieceType)int.Parse($"{data[1]}");
-                return new Tuple<Player.EnumColor, Piece.PieceType>(color, pieceType);
-            }
+            NE = 1, NW = 2, SW = 3, SE = 4
         }
     }
 }

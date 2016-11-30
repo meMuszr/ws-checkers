@@ -21,7 +21,6 @@ namespace Checkers.Components
             DictPointPiece = Piece.createPieces(Color).ToDictionary(key => key.Location, value => value.TypeOfPiece);
         }
 
-
         public enum EnumColor : byte
         {
             White = 1,

@@ -7,5 +7,6 @@ namespace Checkers.Components
 {
     public interface IPlayer
     {
+        Player.EnumColor Color { get; set; }
     }
 }

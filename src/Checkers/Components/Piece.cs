@@ -28,18 +28,19 @@ namespace Checkers.Components
                     for (byte y = 0; y < 3; y++)
                         for (byte x = 0; x < Board.GRID_SIZE; x++)
                             if (y % 2 == x % 2)
-                                yield return new Piece(new Point(x, y), Piece.PieceType.Man);
+                                yield return new Piece(new Point(x, y), PieceType.Man);
                     break;
                 case EnumColor.Black:
                     for (byte y = 5; y < Board.GRID_SIZE; y++)
                         for (byte x = 0; x < Board.GRID_SIZE; x++)
                             if (y % 2 == x % 2)
-                                yield return new Piece(new Point(x, y), Piece.PieceType.Man);
+                                yield return new Piece(new Point(x, y), PieceType.Man);
                     break;
             }
         }
         public enum PieceType
         {
+            Null = 0,
             Man = 1,
             King = 2
         }
