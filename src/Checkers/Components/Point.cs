@@ -7,17 +7,8 @@ namespace Checkers.Components
 {
     public class Point
     {
-        private int x;
-        private int y;
+        #region Private Constructors
 
-        public byte X { get; private set; }
-        public byte Y { get; private set; }
-        public Point setPoint(byte x, byte y)
-        {
-            X = x;
-            Y = y;
-            return this;
-        }
         public Point(byte x, byte y)
         {
             X = x;
@@ -26,9 +17,27 @@ namespace Checkers.Components
 
         public Point(int x, int y)
         {
-            this.x = x;
-            this.y = y;
+            X = (byte)x;
+            Y = (byte)y;
         }
+
+        #endregion Private Constructors
+
+        #region Internal Properties
+
+        internal byte X { get; private set; }
+        internal byte Y { get; private set; }
+
+        #endregion Internal Properties
+
+        #region Public Methods
+
+        public override bool Equals(object obj)
+        {
+            var point = (Point)obj;
+            return X == point.X && Y == point.Y;
+        }
+
         public override int GetHashCode()
         {
             unchecked
@@ -39,10 +48,18 @@ namespace Checkers.Components
                 return hash;
             }
         }
-        public override bool Equals(object obj)
+
+        #endregion Public Methods
+
+        #region Internal Methods
+
+        internal Point setPoint(byte x, byte y)
         {
-            var point = (Point)obj;
-            return X == point.X && Y == point.Y;
+            X = x;
+            Y = y;
+            return this;
         }
+
+        #endregion Internal Methods
     }
 }

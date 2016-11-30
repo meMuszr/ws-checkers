@@ -8,36 +8,18 @@ namespace Checkers.Components
 {
     public class Piece
     {
-        public PieceType TypeOfPiece { get; private set; }
-        public Point Location { get; private set; }
-        public Piece movePiece(byte x, byte y)
-        {
-            Location.setPoint(x, y);
-            return this;
-        }
+        #region Private Constructors
+
         public Piece(Point point, PieceType type)
         {
             Location = point;
             TypeOfPiece = type;
         }
-        public static IEnumerable<Piece> createPieces(EnumColor color)
-        {
-            switch (color)
-            {
-                case EnumColor.White:
-                    for (byte y = 0; y < 3; y++)
-                        for (byte x = 0; x < Board.GRID_SIZE; x++)
-                            if (y % 2 == x % 2)
-                                yield return new Piece(new Point(x, y), PieceType.Man);
-                    break;
-                case EnumColor.Black:
-                    for (byte y = 5; y < Board.GRID_SIZE; y++)
-                        for (byte x = 0; x < Board.GRID_SIZE; x++)
-                            if (y % 2 == x % 2)
-                                yield return new Piece(new Point(x, y), PieceType.Man);
-                    break;
-            }
-        }
+
+        #endregion Private Constructors
+
+        #region Internal Enums
+
         public enum PieceType
         {
             Null = 0,
@@ -45,5 +27,53 @@ namespace Checkers.Components
             King = 2
         }
 
+        #endregion Internal Enums
+
+        #region Internal Properties
+
+        internal Point Location { get; }
+        internal PieceType TypeOfPiece { get; }
+
+        #endregion Internal Properties
+
+        #region Internal Methods
+
+        internal static IEnumerable<Piece> createPieces(EnumColor color)
+        {
+            switch (color)
+            {
+                case EnumColor.White:
+                    for (byte y = 0; y < 3; y++)
+                    {
+                        for (byte x = 0; x < Board.GRID_SIZE; x++)
+                        {
+                            if (y % 2 == x % 2)
+                                yield return new Piece(new Point(x, y), PieceType.Man);
+                        }
+                    }
+
+                    break;
+
+                case EnumColor.Black:
+                    for (byte y = 5; y < Board.GRID_SIZE; y++)
+                    {
+                        for (byte x = 0; x < Board.GRID_SIZE; x++)
+                        {
+                            if (y % 2 == x % 2)
+                                yield return new Piece(new Point(x, y), PieceType.Man);
+                        }
+                    }
+
+                    break;
+            }
+        }
+
+        internal Piece movePiece(byte x, byte y)
+        {
+            Location.setPoint(x, y);
+            return this;
+        }
+
+        #endregion Internal Methods
     }
 }

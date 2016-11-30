@@ -5,28 +5,44 @@ using System.Threading.Tasks;
 
 namespace Checkers.Components
 {
-    public class Player : IPlayer
+    public class Player
     {
-        public EnumColor Color { get; set; }
-        public Dictionary<Point, Piece.PieceType> DictPointPiece { get; private set; }
-        public Player()
-        {
-        }
-        public Player(EnumColor color)
-        {
-            Color = color;
-        }
-        public void Init()
-        {
-            DictPointPiece = Piece.createPieces(Color).ToDictionary(key => key.Location, value => value.TypeOfPiece);
-        }
+        #region Public Constructors
+
+        internal int Pieces => DictPointPiece.Count;
+
+        #endregion Public Constructors
+
+        #region Public Enums
 
         public enum EnumColor : byte
         {
             White = 1,
             Black = 2
         }
-        public bool removePiece(byte x, byte y)
-        => DictPointPiece.Remove(DictPointPiece.Select(kv => kv.Key).Where(point => point.X == x && point.Y == y).SingleOrDefault());
+
+        #endregion Public Enums
+
+        #region Public Properties
+
+        public EnumColor Color { get; set; }
+        public Dictionary<Point, Piece.PieceType> DictPointPiece { get; private set; }
+
+        #endregion Public Properties
+
+        #region Public Methods
+
+        public void Init()
+        {
+            DictPointPiece = Piece.createPieces(Color).ToDictionary(key => key.Location, value => value.TypeOfPiece);
+        }
+
+        internal void addPiece(byte x, byte y, Piece.PieceType typePiece)
+                    => DictPointPiece.Add(new Point(x, y), typePiece);
+
+        internal void removePiece(byte x, byte y)
+        => DictPointPiece.Remove(new Point(x, y));
+
+        #endregion Public Methods
     }
 }

@@ -5,12 +5,15 @@ using System.Threading.Tasks;
 
 namespace Checkers.Components
 {
-    public class MoveInfo
+    internal class MoveInfo
     {
-        public bool isValidJumpMove { get; set; }
-        public bool canJumpAgain { get; set; }
-        public bool isValidMove { get; set; }
-        public Piece JumpedPiece { get; set; }
+        #region Public Properties
 
+        internal bool canJumpAgain { get; set; }
+        internal bool isValidJumpMove { get; set; }
+        internal bool isValidMove { get; set; }
+        internal Piece JumpedPiece { get; set; }
+
+        #endregion Public Properties
     }
 }
