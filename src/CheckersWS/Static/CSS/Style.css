@@ -24,40 +24,66 @@ header {
     }
 
 main {
-    flex: 1;
+    flex:0 1 auto;
+    width:100%;
+
 }
 
-div.users > h2 {
+div.users > header {
     border-top: 1px solid black;
     border-bottom: 1px solid black;
     background-color: white;
     padding: 0.3em;
-    margin: 0;
-    margin-bottom:1em;
-}
-div.users {
-    height:100%;
-    width:100%;
-}
-div.users > section {
-    width: 100%;
-    min-height:80%;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    font-family: "Open Sans", Arial, sans-serif;
-    font-size: large;
-}
-div.users > section > span {
-    
-    padding:0.3em;
+    margin-bottom: 1em;
+    position: relative;
 }
 
+    div.users > header > h2 {
+        margin: 0;
+        display: inline-block;
+    }
+
+    div.users > header > input[type="button"] {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        padding: 0.5em;
+        transform: translateY(-50%);
+        width: 30%;
+        background: none;
+        color: gray;
+        border: 0;
+        outline: none;
+        font-size: large;
+        transition: 0.2s ease-in;
+    }
+
+        div.users > header > input[type="button"]:active {
+            background-color: #bdc8ca;
+        }
+
+div.users {
+    min-height: 100%;
+    width: 100%;
+}
+
+    div.users > section > ul {
+        list-style-type: none;
+        padding-left: 0;
+        font-family: "Open Sans", Arial, sans-serif;
+        font-size: large;
+    }
+
+        div.users > section > ul > li {
+            padding: 0.3em;
+        }
+
 body {
-    margin: 1em auto 0;
-    min-width: 95vw;
-    min-height: 95vh;
-    height: 50vh;
+    margin: 0 auto;
+    min-width: 100vw;
+    min-height: 100vh;
+    width:1px;
+    height: 1px;
     background-color: rgb(78, 111, 130);
 }
 
@@ -66,7 +92,7 @@ body {
         flex-direction: column;
         margin: 0 auto;
         width: 80%;
-        height: 95%;
+        min-height: 95%;
         text-align: center;
         border: 2px ridge black;
         padding-bottom: 2em;

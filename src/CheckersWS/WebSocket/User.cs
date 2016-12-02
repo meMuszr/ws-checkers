@@ -1,18 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace CheckersWS.WebSocket
 {
     public class User
     {
-        public string Name { get; set; }
-        public IEnumerable<Games> Games { get; set; }
+        #region Public Constructors
 
         public User(string name)
         {
             Name = name;
         }
+
+        #endregion Public Constructors
+
+        #region Public Properties
+
+        public IEnumerable<Games> Games { get; set; }
+        public string Name { get; set; }
+
+        #endregion Public Properties
     }
 }

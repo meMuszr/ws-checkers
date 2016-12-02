@@ -4,6 +4,8 @@
     <meta charset="utf-8" />
     <title>Checkers</title>
     <link href="CSS/Style.css" rel="stylesheet" />
+    <script src="Javascript/jquery-3.1.1.js"></script>
+    <script src="Javascript/Checkers.js"></script>
 </head>
 <body>
     <div class="load">
@@ -17,13 +19,20 @@
             <form class="connect">
                 <input name="username" type="text" placeholder="username" maxlength="10" required /> <input type="submit" value="connect" />
             </form>
+            <div class="header">
+
+            </div>
             <div class="users">
-                <h2>Users</h2>
-                <section></section>
+                <header>
+                    <h2>Users</h2>
+                    <input name="close" type="button" value="disconnect" />
+                </header>
+                <section>
+                    <ul></ul>
+                </section>
             </div>
         </main>
     </div>
-    <script src="Javascript/jquery-3.1.1.js"></script>
-    <script src="Javascript/Checkers.js"></script>
+
 </body>
 </html>
