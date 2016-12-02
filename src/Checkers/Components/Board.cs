@@ -64,9 +64,9 @@ namespace Checkers.Components
                         }
                     }
                 }
+                sb.AppendLine();
             }
 
-            sb.AppendLine();
             return sb.ToString();
         }
 
