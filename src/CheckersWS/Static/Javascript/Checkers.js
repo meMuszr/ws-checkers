@@ -23,7 +23,7 @@ var Init = function () {
             switch (data.method) {
                 case 'login':
                     $.each(data.object, function (ind, val) {
-                        usersElement.append('<div data-name="' + val  + '">' + val + '</div>');
+                        usersElement.append('<span data-name="' + val  + '">' + val + '</span>');
                     });
                     $('form.connect').hide();
                     usersContainer.show();
