@@ -34,7 +34,9 @@ namespace CheckersWS
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            app.Map("/ws", Handler.Map);
+            app.UseDefaultFiles()
+                .UseStaticFiles()
+                .Map("/ws", Handler.Map);
         }
 
         public void ConfigureServices(IServiceCollection services)

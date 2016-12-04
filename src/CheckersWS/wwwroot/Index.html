@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Checkers</title>
     <link href="CSS/Style.css" rel="stylesheet" />
     <script src="Javascript/jquery-3.1.1.js"></script>
@@ -19,17 +20,18 @@
             <form class="connect">
                 <input name="username" type="text" placeholder="username" maxlength="10" required /> <input type="submit" value="connect" />
             </form>
-            <div class="header">
-
-            </div>
             <div class="users">
                 <header>
                     <h2>Users</h2>
-                    <input name="close" type="button" value="disconnect" />
+                    <input name="close" type="button" value="X" />
                 </header>
                 <section>
                     <ul></ul>
                 </section>
+            </div>
+            <div class="game">
+                <header><h2>Game</h2></header>
+                <section></section>
             </div>
         </main>
     </div>

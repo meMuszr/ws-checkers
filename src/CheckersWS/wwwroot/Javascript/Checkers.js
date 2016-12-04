@@ -3,9 +3,12 @@ var Init = function () {
     var Username = "";
     var usersElement = $('ul', 'div.users');
     var usersContainer = $('div.users');
+    var gameContainer = $('div.game');
     var loggedIn = false;
+    var client = null;
     var arrayUsers = [];
     usersContainer.hide();
+    gameContainer.hide();
     $('form.connect').submit(function (e) {
         e.preventDefault();
         $('div.load').toggle();
@@ -13,17 +16,17 @@ var Init = function () {
     });
     
     var startWS = function (user) {
-        var client = new WebSocket('ws://localhost:5000/ws');
+        client = new WebSocket('ws://localhost:5000/ws');
         client.onclose = function () {
             $('form.connect').show();
             usersContainer.hide();
             loggedIn = false;
         };
-        client.onopen = function(evt) {
+        client.onopen = function (evt) {
             $('div.load').toggle();
             client.send("login:" + user);
         };
-        client.onmessage = function(evt) {
+        client.onmessage = function (evt) {
             var data = { message: evt.data.split(':') };
             data.method = data.message[0];
             data.object = JSON.parse(data.message[1]);
@@ -41,7 +44,7 @@ var Init = function () {
                     }
                     else {
                         if (arrayUsers.filter(function (e) {
-                                return e === data.object
+                                return e === data.object;
                         }).length === 0) {
                             arrayUsers.push(data.object);
                             usersElement.append('<li data-name="' + data.object + '">' + data.object + '</li>');
@@ -68,6 +71,13 @@ var Init = function () {
 
 
         });
+        $('ul', usersContainer).on('click', 'li', function (e) {
+            if (Username === e.currentTarget.innerText || client === null) return;
+            if (loggedIn) startGame(e);
+        });
+    };
+    var startGame = function (evt) {
+        client.send("newGame:" + evt.currentTarget.innerText);
     }
 };
 

@@ -14,31 +14,18 @@ namespace CheckersWS
 {
     public class Handler
     {
-        #region Private Fields
-
         private static readonly IEqualityComparer<User> UserComparer = new UsersComparer();
+
         private static HashSet<User> Users = new HashSet<User>(comparer: UserComparer);
-        private WS.WebSocket Socket;
-
-        #endregion Private Fields
-
-        #region Private Constructors
+        private readonly WS.WebSocket Socket;
 
         private Handler(WS.WebSocket socket)
         {
             Socket = socket;
         }
 
-        #endregion Private Constructors
-
-        #region Private Properties
-
-        private static List<WS.WebSocket> _webSockets { get; } = new List<WS.WebSocket>();
-        private User User { get; set; }
-
-        #endregion Private Properties
-
-        #region Public Methods
+        private static List<Handler> _handler { get; } = new List<Handler>();
+        internal User User { get; set; }
 
         public static void Map(IApplicationBuilder app)
         {
@@ -46,18 +33,14 @@ namespace CheckersWS
             app.Use(AcceptorAsync);
         }
 
-        #endregion Public Methods
-
-        #region Private Methods
-
         private static async Task AcceptorAsync(HttpContext context, Func<Task> n)
         {
             if (!context.WebSockets.IsWebSocketRequest) return;
 
             using (WS.WebSocket socket = await context.WebSockets.AcceptWebSocketAsync())
             {
-                _webSockets.Add(socket);
                 var handler = new Handler(socket);
+                _handler.Add(handler);
                 await handler.EchoLoopAsync();
             }
         }
@@ -70,7 +53,6 @@ namespace CheckersWS
                 var incoming = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 if (incoming.MessageType == WS.WebSocketMessageType.Text)
                 {
-                    var hello = new ArraySegment<byte>(buffer);
                     string[] data = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer, 0, incoming.Count).ToArray()).Split(':');
                     switch (data[0])
                     {
@@ -81,29 +63,32 @@ namespace CheckersWS
                                 Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"login:{JsonConvert.SerializeObject(Users.Select(c => c.Name))}")), WS.WebSocketMessageType.Text, incoming.EndOfMessage, CancellationToken.None);
                                 Users.Add(User);
                             }
-                            _webSockets.ForEach(webSocket => webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"login:{JsonConvert.SerializeObject(data[1])}")), WS.WebSocketMessageType.Text, incoming.EndOfMessage, CancellationToken.None));
+                            _handler.ForEach(handler => handler.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"login:{JsonConvert.SerializeObject(data[1])}")), WS.WebSocketMessageType.Text, incoming.EndOfMessage, CancellationToken.None));
                             Console.WriteLine(data[1]);
-
                             break;
+                        case "newGame":
+                            User Opponent = new User(data[1]);
+                            if (Users.Contains(Opponent))
+                            {
+                                var game = _handler.Where(c => c.User.Name == User.Name || c.User.Name == Opponent.Name).ToList();
+                                if (game.Count == 2) {
+                                    game.ForEach(handler => {
+                                    });
+                                }
+                            }   break;
                     }
                 }
             }
             if (Socket.State != WS.WebSocketState.Open)
             {
-                _webSockets.Remove(Socket);
+                _handler.Remove(this);
                 Users.Remove(User);
-                _webSockets.ForEach(webSocket => webSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"removelogin:{JsonConvert.SerializeObject(User.Name)}")), WS.WebSocketMessageType.Text, true, CancellationToken.None));
+                _handler.ForEach(handler => handler.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"removelogin:{JsonConvert.SerializeObject(User.Name)}")), WS.WebSocketMessageType.Text, true, CancellationToken.None));
             }
         }
 
-        #endregion Private Methods
-
-        #region Private Classes
-
         private class UsersComparer : IEqualityComparer<User>
         {
-            #region Public Methods
-
             public bool Equals(User x, User y)
             {
                 if (x == null && y == null)
@@ -115,10 +100,6 @@ namespace CheckersWS
 
             public int GetHashCode(User obj)
             => (obj == null) ? 0 : obj.Name.GetHashCode();
-
-            #endregion Public Methods
         }
-
-        #endregion Private Classes
     }
 }
