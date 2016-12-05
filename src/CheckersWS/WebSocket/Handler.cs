@@ -73,6 +73,7 @@ namespace CheckersWS
                                 var game = _handler.Where(c => c.User.Name == User.Name || c.User.Name == Opponent.Name).ToList();
                                 if (game.Count == 2) {
                                     game.ForEach(handler => {
+                                        handler.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"createGame:{JsonConvert.SerializeObject(game)}")),WS.WebSocketMessageType.Text,incoming.EndOfMessage,CancellationToken.None);
                                     });
                                 }
                             }   break;

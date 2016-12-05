@@ -62,6 +62,18 @@ var Init = function () {
                         return $(this).data('name') === data.object;
                     }).remove();
                     break;
+                case 'createGame':
+                    if (data.object.constructor === Array) {
+                        $.each(data.object, function (ind, val) {
+                            arrayUsers.splice(arrayUsers.indexOf(val), 1);
+                            $("li", usersElement).filter(function () {
+                                return $(this).data('name') === val;
+                            }).remove();
+                        });
+                        usersContainer.hide();
+                        gameContainer.show();
+                    }
+                    break;
             }
         };
         $('input[name="close"]', 'div.users > header').on('click', function (e) {
@@ -73,12 +85,12 @@ var Init = function () {
         });
         $('ul', usersContainer).on('click', 'li', function (e) {
             if (Username === e.currentTarget.innerText || client === null) return;
-            if (loggedIn) startGame(e);
+            if (loggedIn) client.send("newGame:" + e.currentTarget.innerText);
+
         });
     };
-    var startGame = function (evt) {
-        client.send("newGame:" + evt.currentTarget.innerText);
-    }
+
+
 };
 
 $(Init);
