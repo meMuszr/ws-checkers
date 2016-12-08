@@ -14,7 +14,7 @@ namespace CheckersWS
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:5000")
+                .UseUrls("http://*:5000/")
                 .Build();
             host.Run();
         }

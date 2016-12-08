@@ -39,24 +39,24 @@ namespace Checkers.Components
         {
             switch (color)
             {
-                case EnumColor.White:
+                case EnumColor.Black:
                     for (byte y = 0; y < 3; y++)
                     {
                         for (byte x = 0; x < Board.GRID_SIZE; x++)
                         {
-                            if (y % 2 == x % 2)
+                            if (y % 2 != x % 2)
                                 yield return new Piece(new Point(x, y), PieceType.Man);
                         }
                     }
 
                     break;
 
-                case EnumColor.Black:
+                case EnumColor.White:
                     for (byte y = 5; y < Board.GRID_SIZE; y++)
                     {
                         for (byte x = 0; x < Board.GRID_SIZE; x++)
                         {
-                            if (y % 2 == x % 2)
+                            if (y % 2 != x % 2)
                                 yield return new Piece(new Point(x, y), PieceType.Man);
                         }
                     }

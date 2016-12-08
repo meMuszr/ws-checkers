@@ -4,6 +4,9 @@
     font-weight: normal;
     font-style: normal;
 }
+.highlight {
+    background-color:orange !important;
+}
 
 h1,
 h2 {

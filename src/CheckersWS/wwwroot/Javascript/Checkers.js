@@ -4,8 +4,13 @@ var Init = function () {
     var usersElement = $('ul', 'div.users');
     var usersContainer = $('div.users');
     var gameContainer = $('div.game');
+    var gameId = null;
+    var isTurn = null;
+    var color = null;
+    var itemHighlight = null;
     var loggedIn = false;
     var client = null;
+    var sendPoint = {};
     var arrayUsers = [];
     usersContainer.hide();
     gameContainer.hide();
@@ -14,9 +19,8 @@ var Init = function () {
         $('div.load').toggle();
         startWS($('input[name="username"]', e.form).val());
     });
-    
     var startWS = function (user) {
-        client = new WebSocket('ws://localhost:5000/ws');
+        client = new WebSocket('ws://192.168.1.105:5000/ws');
         client.onclose = function () {
             $('form.connect').show();
             usersContainer.hide();
@@ -24,13 +28,14 @@ var Init = function () {
         };
         client.onopen = function (evt) {
             $('div.load').toggle();
-            client.send("login:" + user);
+            client.send("login=" + user);
         };
         client.onmessage = function (evt) {
-            var data = { message: evt.data.split(':') };
+            var data = { message: evt.data.split('=') };
             data.method = data.message[0];
             data.object = JSON.parse(data.message[1]);
             switch (data.method) {
+
                 case 'login':
                     if (data.object.constructor === Array) {
                         $.each(data.object, function (ind, val) {
@@ -57,6 +62,14 @@ var Init = function () {
                     }
                     break;
                 case 'removelogin':
+                    if (data.object.constructor === Array) {
+                        $.each(data.object, function (i, val) {
+                            arrayUsers.splice(arrayUsers.indexOf(val), 1);
+                            $("li", usersElement).filter(function () {
+                                return $(this).data('name') === val;
+                            }).remove();
+                        });
+                    }
                     arrayUsers.splice(arrayUsers.indexOf(data.object), 1);
                     $("li", usersElement).filter(function () {
                         return $(this).data('name') === data.object;
@@ -74,6 +87,31 @@ var Init = function () {
                         gameContainer.show();
                     }
                     break;
+                case 'gameId':
+                    gameId = data.object;
+                    break;
+                case 'isTurn':
+                    isTurn = data.object.isTurn;
+                    color = data.object.Color;
+                    break;
+                case 'move':
+                    if (itemHighlight !== null) itemHighlight.removeClass('highlight');
+                    if (data.object.UpdateMove) {
+                        var gameBoard = $('section > div', gameContainer);
+                        var oldPiece = gameBoard.eq(data.object.OldPoint.Y).children().eq(data.object.OldPoint.X);
+                        var newPiece = gameBoard.eq(data.object.NewPoint.Y).children().eq(data.object.NewPoint.X);
+
+                        if (data.object.RemovePoint) {
+                            gameBoard.eq(data.object.RemovePoint.Y).children().eq(data.object.RemovePoint.X).html('');
+                        }
+                        if (data.object.GameState === 3) $('header > h2', 'div.game').text('game over :(');
+                        newPiece.html(oldPiece.html());
+                        oldPiece.html('');
+                        isTurn = !isTurn;
+
+                    }
+                    break;
+
             }
         };
         $('input[name="close"]', 'div.users > header').on('click', function (e) {
@@ -85,11 +123,51 @@ var Init = function () {
         });
         $('ul', usersContainer).on('click', 'li', function (e) {
             if (Username === e.currentTarget.innerText || client === null) return;
-            if (loggedIn) client.send("newGame:" + e.currentTarget.innerText);
+            if (loggedIn) client.send("newGame=" + e.currentTarget.innerText);
 
         });
     };
 
+    $("div > div ", gameContainer).on('click', function (e) {
+        if (!isTurn) return;
+        if ($(this).index() % 2 === $(this).parent().index() % 2) return;
+        console.log($(this).index() + "," + $(this).parent().index());
+        var elementClicked = $(e.currentTarget);
+        if (itemHighlight === null) {
+            if (elementClicked.find('circle').attr('fill') === 'red' && color === 'White'
+                || elementClicked.find('circle').attr('fill') === 'green' && color === 'Black') {
+                sendPoint.OldPoint = {
+                    X: $(this).index(),
+                    Y: $(this).parent().index()
+                };
+                itemHighlight = elementClicked;
+                itemHighlight.addClass('highlight');
+            }
+        }
+        else {
+            if (elementClicked.find('circle').attr('fill') === 'red' && color === 'White'
+                || elementClicked.find('circle').attr('fill') === 'green' && color === 'Black') {
+                sendPoint.OldPoint = {
+                    X: $(this).index(),
+                    Y: $(this).parent().index()
+                };
+                itemHighlight.removeClass('highlight');
+                itemHighlight = elementClicked;
+                itemHighlight.addClass('highlight');
+            }
+            else if (elementClicked.not(":has(*)").length > 0) {
+                sendPoint.NewPoint = {
+                    X: $(this).index(),
+                    Y: $(this).parent().index()
+                };
+                client.send("makeMove=" + JSON.stringify(sendPoint));
+            }
+
+
+        }
+
+
+    });
 
 };
 

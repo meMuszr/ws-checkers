@@ -1,15 +1,17 @@
-﻿namespace Checkers.Components
+﻿using Newtonsoft.Json;
+
+namespace Checkers.Components
 {
     public class Point
     {
         #region Private Constructors
 
+        [JsonConstructor]
         public Point(byte x, byte y)
         {
             X = x;
             Y = y;
         }
-
         public Point(int x, int y)
         {
             X = (byte)x;
@@ -19,8 +21,9 @@
         #endregion Private Constructors
 
         #region Internal Properties
-
+        [JsonProperty]
         internal byte X { get; private set; }
+        [JsonProperty]
         internal byte Y { get; private set; }
 
         #endregion Internal Properties

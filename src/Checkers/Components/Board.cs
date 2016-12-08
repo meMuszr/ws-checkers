@@ -12,12 +12,6 @@ namespace Checkers.Components
 
         #endregion Public Fields
 
-        #region Private Fields
-
-        private static Dictionary<Direction, Func<bool, bool>> directionFunc = new Dictionary<Direction, Func<bool, bool>>();
-
-        #endregion Private Fields
-
         #region Public Enums
 
         internal enum Direction
@@ -95,38 +89,6 @@ namespace Checkers.Components
         #endregion Public Methods
 
         #region Private Methods
-
-        //TODO -
-        //Add conditional for if location is used / empty --done
-        //Add check for jumps
-        private bool canMove(Piece piece, Point newCoordinates)
-        {
-            bool rtnBool = false;
-            switch (piece.TypeOfPiece)
-            {
-                case Piece.PieceType.Man:
-                    rtnBool |= (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
-                               (piece.Location.Y + 1 == newCoordinates.Y);
-                    break;
-
-                case Piece.PieceType.King:
-                    rtnBool |= (piece.Location.X + 1 == newCoordinates.X || piece.Location.X - 1 == newCoordinates.X) &&
-                               (piece.Location.Y + 1 == newCoordinates.Y || piece.Location.Y - 1 == newCoordinates.Y);
-                    break;
-
-                default:
-                    rtnBool |= false;
-                    break;
-            }
-            return rtnBool;
-        }
-
-        private Point isNewCoordinateValid(Point point)
-        {
-            if (point == null) throw new ArgumentNullException();
-            if (point.X >= Grid.Length || point.Y >= Grid.Length) throw new ArgumentException();
-            else return point;
-        }
 
         private byte PieceInfoToByte(Player.EnumColor color, Piece.PieceType pieceType) => byte.Parse($"{(int)color}{(int)pieceType}");
 

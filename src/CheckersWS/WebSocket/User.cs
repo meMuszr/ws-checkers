@@ -15,7 +15,7 @@ namespace CheckersWS.WebSocket
 
         #region Public Properties
 
-        public IEnumerable<Games> Games { get; set; }
+        public bool isInGame { get; set; }
         public string Name { get; set; }
 
         #endregion Public Properties

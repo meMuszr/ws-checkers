@@ -19,7 +19,7 @@ namespace Checkers
 
         public enum StateOfGame
         {
-            WhiteTurn = 1, BlackTurn = 2, GameOver = 3
+            White = 1, Black = 2, GameOver = 3
         }
 
         #endregion Public Enums
@@ -34,32 +34,41 @@ namespace Checkers
 
         #region Public Methods
 
-        public void MakeMove(Point point, Point newPoint)
+        public MoveValidation MakeMove(Point point, Point newPoint)
         {
             if (point == null || newPoint == null) throw new ArgumentNullException();
-
+            var rtnValue = default(MoveValidation);
             Tuple<Player, Piece> oldPiece = getPieceInfo(point.X, point.Y);
 
             if (oldPiece == null) throw new ArgumentException();
             MoveInfo moveInfo = getMoveInfo(oldPiece.Item2, newPoint);
-            if (State == StateOfGame.WhiteTurn && oldPiece.Item1.Color == Player.EnumColor.White || State == StateOfGame.BlackTurn && oldPiece.Item1.Color == Player.EnumColor.Black)
+            if (State == StateOfGame.White && oldPiece.Item1.Color == Player.EnumColor.White || State == StateOfGame.Black && oldPiece.Item1.Color == Player.EnumColor.Black)
             {
                 if (moveInfo.isValidMove || moveInfo.isValidJumpMove)
                 {
+                    rtnValue = new MoveValidation
+                    {
+                        UpdateMove = true,
+                        OldPoint = point,
+                        NewPoint = newPoint
+                    };
                     oldPiece.Item1.removePiece(point.X, point.Y);
                     oldPiece.Item1.addPiece(newPoint.X, newPoint.Y, oldPiece.Item2.TypeOfPiece);
                     Board.relocatePoint(point, newPoint);
                     if (moveInfo.JumpedPiece != null && moveInfo.isValidJumpMove)
                     {
+                        rtnValue.RemovePoint = moveInfo.JumpedPiece.Location;
                         getPieceInfo(moveInfo.JumpedPiece.Location.X, moveInfo.JumpedPiece.Location.Y).Item1.removePiece(moveInfo.JumpedPiece.Location.X, moveInfo.JumpedPiece.Location.Y);
                         Board.removePoint(moveInfo.JumpedPiece.Location);
                     }
+                    State = State == StateOfGame.White ? StateOfGame.Black : StateOfGame.White;
+                    rtnValue.GameState = State;
                 }
-                if (State == StateOfGame.WhiteTurn) State = StateOfGame.BlackTurn;
-                else State = StateOfGame.WhiteTurn;
+
             }
             if (Players.One.Pieces == 0 || Players.Two.Pieces == 0)
                 State = StateOfGame.GameOver;
+            return rtnValue ?? new MoveValidation();
         }
 
         #endregion Public Methods
@@ -96,12 +105,12 @@ namespace Checkers
                     if (oldPieceInfo.Item1.Color == Player.EnumColor.White)
                     {
                         if (piece.TypeOfPiece == Piece.PieceType.Man)
-                            rtnMove.isValidMove = directionOfMove == Board.Direction.NE || directionOfMove == Board.Direction.NW;
+                            rtnMove.isValidMove = directionOfMove == Board.Direction.SE || directionOfMove == Board.Direction.SW;
                     }
                     else
                     {
                         if (piece.TypeOfPiece == Piece.PieceType.Man)
-                            rtnMove.isValidMove = directionOfMove == Board.Direction.SE || directionOfMove == Board.Direction.SW;
+                            rtnMove.isValidMove = directionOfMove == Board.Direction.NE || directionOfMove == Board.Direction.NW;
                     }
                 }
                 else if (isJumpMove)
@@ -110,12 +119,12 @@ namespace Checkers
                     if (oldPieceInfo.Item1.Color == Player.EnumColor.White)
                     {
                         if (piece.TypeOfPiece == Piece.PieceType.Man)
-                            validDirection = directionOfMove == Board.Direction.NE || directionOfMove == Board.Direction.NW;
+                            validDirection = directionOfMove == Board.Direction.SE || directionOfMove == Board.Direction.SW;
                     }
                     else
                     {
                         if (piece.TypeOfPiece == Piece.PieceType.Man)
-                            validDirection = directionOfMove == Board.Direction.SE || directionOfMove == Board.Direction.SW;
+                            validDirection = directionOfMove == Board.Direction.NE || directionOfMove == Board.Direction.NW;
                     }
                     if (validDirection)
                     {
@@ -145,7 +154,7 @@ namespace Checkers
         {
             Players.One.Color = Player.EnumColor.White;
             Players.Two.Color = Player.EnumColor.Black;
-            State = StateOfGame.WhiteTurn;
+            State = StateOfGame.White;
             InitPlayer(Players.One);
             InitPlayer(Players.Two);
         }
@@ -172,13 +181,13 @@ namespace Checkers
             switch (directionOfMove)
             {
                 case Board.Direction.NE: // (0,4) -> (1,3)
-                    pieceInfo = getPieceInfo(newCoordinates.X + 1, newCoordinates.Y - 1);
+                    pieceInfo = getPieceInfo(newCoordinates.X - 1, newCoordinates.Y - 1);
                     if (pieceInfo?.Item1.Color != oldPieceInfo?.Item1.Color)
-                        rtnInfo = new Tuple<bool, Piece>(true, pieceInfo.Item2);
+                        rtnInfo = new Tuple<bool, Piece>(true, pieceInfo?.Item2);
                     break;
 
                 case Board.Direction.NW:// (7,4) -> (6,3)
-                    pieceInfo = getPieceInfo(newCoordinates.X - 1, newCoordinates.Y - 1);
+                    pieceInfo = getPieceInfo(newCoordinates.X + 1, newCoordinates.Y - 1);
                     if (pieceInfo?.Item1.Color != oldPieceInfo?.Item1.Color)
                         rtnInfo = new Tuple<bool, Piece>(true, pieceInfo.Item2);
                     break;
