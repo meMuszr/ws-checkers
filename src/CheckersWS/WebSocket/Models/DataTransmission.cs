@@ -7,8 +7,11 @@ namespace CheckersWS.WebSocket.Models
 {
     public class DataTransmission<T>
     {
+        #region Public Properties
+
+        public T Message { get; set; }
         public string MessageType { get; set; }
 
-        public T Message {get;set;}
+        #endregion Public Properties
     }
 }

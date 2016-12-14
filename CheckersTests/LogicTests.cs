@@ -1,5 +1,6 @@
 ﻿using Checkers;
 using Checkers.Components;
+using CheckersWS.WebSocket.Models;
 using System;
 using Xunit;
 
@@ -10,6 +11,13 @@ namespace CheckersTests
         #region Public Methods
 
         [Fact]
+        public void CheckDataTransmission()
+        {
+            var data = new DataTransmission<MoveValidation> { Message = new MoveValidation { GameState = Game.StateOfGame.GameOver, UpdateMove = true } };
+            Console.WriteLine(data.Message);
+        }
+
+        [Fact]
         public void PassingTest()
         {
             var game = new Game();
@@ -17,11 +25,11 @@ namespace CheckersTests
             Console.WriteLine(game.Board.ToString());
             Console.WriteLine("             ");
             Console.WriteLine("             ");
-            game.MakeMove(new Point(3,2), new Point(2,3));
+            game.MakeMove(new Point(3, 2), new Point(2, 3));
             Console.WriteLine(game.Board.ToString());
             Console.WriteLine("             ");
             Console.WriteLine("             ");
-            game.MakeMove(new Point(1,4), new Point(3,2));
+            game.MakeMove(new Point(1, 4), new Point(3, 2));
             Console.WriteLine(game.Board.ToString());
             Console.WriteLine("             ");
             Console.WriteLine("             ");
