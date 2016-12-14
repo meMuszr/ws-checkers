@@ -1,4 +1,5 @@
 ﻿using CheckersWS.WebSocket;
+using CheckersWS.WebSocket.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -53,55 +54,72 @@ namespace CheckersWS
             var existingLogin = false;
             while (Socket.State == WS.WebSocketState.Open)
             {
+                //save incoming data
                 var incoming = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 if (incoming.MessageType == WS.WebSocketMessageType.Text)
                 {
-
-                    string[] data = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer, 0, incoming.Count).ToArray()).Split('=');
+                    //parse incoming data
+                    var data = ParseIncomingData<string>(incoming);
+                    //holding variable for out method
                     Games currentGame = default(Games);
-                    switch (data[0])
+                    //switch messageTypes
+                    switch (data.MessageType)
                     {
                         case "login":
-                            User = new User(data[1]);
+                            //Create User with this username
+                            User = new User(data.Message);
+                            //If not included in hashset,
                             if (!Users.Contains(User))
                             {
                                 //send everybody to this user
-                                await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"login={JsonConvert.SerializeObject(Users.Where(c => c.isInGame == false).Select(c => c.Name))}")), WS.WebSocketMessageType.Text, incoming.EndOfMessage, CancellationToken.None);
+                                await SendCompleteMessageAsync(Socket, new DataTransmission<IEnumerable<string>> { MessageType = "login", Message = Users.Where(c => c.isInGame == false).Select(c => c.Name) });
+                                //add user to hashset
                                 Users.Add(User);
                             }
+                            //if in hashset
                             else
                             {
+                                //close connection
                                 await Socket.CloseAsync(WS.WebSocketCloseStatus.NormalClosure, null, CancellationToken.None);
+                                //let server know that this handler is an existinglogin
                                 existingLogin = true;
                                 break;
                             }
                             //send user to everybody
-                            _handler.ForEach(handler => handler.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"login={JsonConvert.SerializeObject(data[1])}")), WS.WebSocketMessageType.Text, incoming.EndOfMessage, CancellationToken.None));
-                            Console.WriteLine(data[1]);
+                            _handler.ForEach(async handler => await SendCompleteMessageAsync(handler.Socket, new DataTransmission<string> { MessageType = "login", Message = data.Message}));
                             break;
                         case "newGame":
-                            User Opponent = new User(data[1]);
+                            //Create opponent with recieved username
+                            User Opponent = new User(data.Message);
+                            //validation checking,
                             if (Users.Contains(Opponent))
                             {
+                                //find handlers where username is equal to requested opponent and sender's username -- update IsInGame status to true, convert is true
                                 var game = _handler.Where(c => c.User.Name == User.Name || c.User.Name == Opponent.Name).Select(c => { c.User.isInGame = true; return c; }).ToList();
+                                //More validation checking, we should only recieve 2 entries
                                 if (game.Count == 2)
                                 {
-                                    _handler.Where(c => c.User.Name != User.Name || c.User.Name == Opponent.Name).ToList().ForEach(
-                                       handler => handler.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"removelogin={JsonConvert.SerializeObject(new string[2] { User.Name, Opponent.Name })}")), WS.WebSocketMessageType.Text, true, CancellationToken.None));
+                                    //tell everyone in lobby to remove people who just made game
+                                    _handler.Where(c => c.User.isInGame == false).ToList().ForEach(
+                                        async handler => await SendCompleteMessageAsync(handler.Socket, new DataTransmission<string[]> { MessageType = "removelogin", Message = new string[2] { User.Name, Opponent.Name } }));
+                                    //add to dictionary
                                     DictGames.Add(Count, new Games());
+                                    //try get game value
                                     DictGames.TryGetValue(Count, out currentGame);
                                     if (currentGame != null) {
                                         game.ForEach(handler =>
                                         {
-                                            _handler.Remove(handler);
+                                            //set gameID for handler 
                                             handler.GameId = Count;
+                                            //
                                             DictGames[Count].Users.Add(handler.User.Name, handler);
                                         });
 
                                        foreach(var user in currentGame.Users)
                                         {
-                                            await user.Value.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"createGame={JsonConvert.SerializeObject(DictGames[Count].Users.Keys)}")), WS.WebSocketMessageType.Text, true, CancellationToken.None);
-                                            await user.Value.Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"gameId={Count}")), WS.WebSocketMessageType.Text, true, CancellationToken.None);
+                                            //give them
+                                            await SendCompleteMessageAsync(user.Value.Socket, new DataTransmission<Dictionary<string,Handler>.KeyCollection> { MessageType = "createGame", Message = DictGames[Count].Users.Keys });
+                                            await SendCompleteMessageAsync(user.Value.Socket, new DataTransmission<int> { MessageType = "gameId", Message = Count });
                                         };
                                     }
                                     await game.Find(c => c.User.Name == User.Name).Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"isTurn={JsonConvert.SerializeObject(new {isTurn = true, Color = "White"})} ")), WS.WebSocketMessageType.Text, true, CancellationToken.None);
@@ -111,7 +129,7 @@ namespace CheckersWS
                             }
                             break;
                         case "makeMove":
-                          var moveData =  JsonConvert.DeserializeObject<Move>(data[1]);
+                          var moveData =  JsonConvert.DeserializeObject<Move>(data.Message);
                             DictGames.TryGetValue(GameId ?? -1, out currentGame);
                            var moveInfo = currentGame.GameInstance.MakeMove(moveData.OldPoint, moveData.NewPoint);
                             foreach(var user in currentGame.Users)
@@ -147,8 +165,20 @@ namespace CheckersWS
                 }
             }
         }
-
-        private class UsersComparer : IEqualityComparer<User>
+        private static async Task SendCompleteMessageAsync<T>(WS.WebSocket Socket, DataTransmission<T> data) {
+        await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"{data.MessageType}={JsonConvert.SerializeObject(data.Message)}")), WS.WebSocketMessageType.Text, true, CancellationToken.None);
+        }
+        private static DataTransmission<T> ParseIncomingData<T>(WS.WebSocketReceiveResult retrival)
+        {
+            var buffer = new byte[1024 * 4];
+            string[] data = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer, 0, retrival.Count).ToArray()).Split('=');
+            return new DataTransmission<T>
+            {
+                MessageType = data[0],
+                Message = JsonConvert.DeserializeObject<T>(data[1])
+            };
+        }
+    private class UsersComparer : IEqualityComparer<User>
         {
             public bool Equals(User x, User y)
             {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -34,9 +35,10 @@ namespace CheckersWS
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            app.UseDefaultFiles()
-                .UseStaticFiles()
-                .Map("/ws", Handler.Map);
+            app.UseForwardedHeaders(new ForwardedHeadersOptions  {ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto })
+               .UseDefaultFiles()
+               .UseStaticFiles()
+               .Map("/ws", Handler.Map);
         }
 
         public void ConfigureServices(IServiceCollection services)

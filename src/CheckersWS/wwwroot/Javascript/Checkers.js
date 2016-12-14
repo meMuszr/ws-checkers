@@ -20,7 +20,7 @@ var Init = function () {
         startWS($('input[name="username"]', e.form).val());
     });
     var startWS = function (user) {
-        client = new WebSocket('ws://192.168.1.105:5000/ws');
+        client = new WebSocket('ws://localhost:5000/ws');
         client.onclose = function () {
             $('form.connect').show();
             usersContainer.hide();
