@@ -38,6 +38,14 @@ namespace Checkers
         {
             if (point == null || newPoint == null) throw new ArgumentNullException();
             var rtnValue = default(MoveValidation);
+            if (point.X > Board.GRID_SIZE - 1 ||
+                point.Y > Board.GRID_SIZE - 1 ||
+            point.X < 0 ||
+            point.Y < 0 ||
+            newPoint.X > Board.GRID_SIZE - 1 ||
+            newPoint.Y > Board.GRID_SIZE - 1 ||
+            newPoint.X < 0 ||
+            newPoint.Y < 0) return rtnValue;
             Tuple<Player, Piece> oldPiece = getPieceInfo(point.X, point.Y);
 
             if (oldPiece == null) throw new ArgumentException();
@@ -67,7 +75,7 @@ namespace Checkers
 
             }
             if (Players.One.Pieces == 0 || Players.Two.Pieces == 0)
-                State = StateOfGame.GameOver;
+                State = rtnValue.GameState = StateOfGame.GameOver;
             return rtnValue ?? new MoveValidation();
         }
 

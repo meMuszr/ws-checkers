@@ -84,7 +84,7 @@ namespace CheckersWS
             };
         }
 
-        //wrapper method for obnoxious data
+        //wrapper method for obnoxious data send
         private static async Task SendCompleteMessageAsync<T>(WS.WebSocket Socket, DataTransmission<T> data)
         {
             await Socket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes($"{data.MessageType}={JsonConvert.SerializeObject(data.Message)}")), WS.WebSocketMessageType.Text, true, CancellationToken.None);
@@ -101,8 +101,9 @@ namespace CheckersWS
                 var incoming = await Socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
                 if (incoming.MessageType == WS.WebSocketMessageType.Text)
                 {
+                    string[] dataString = Encoding.UTF8.GetString(new ArraySegment<byte>(buffer, 0, incoming.Count).ToArray()).Split('=');
                     //parse incoming data
-                    var data = ParseIncomingData<string>(incoming);
+                    var data = new DataTransmission<string> { Message = dataString[1], MessageType = dataString[0] };
                     //holding variable for out method
                     Games currentGame = default(Games);
                     //switch messageTypes
@@ -195,7 +196,7 @@ namespace CheckersWS
                                 _handler.Where(c => currentGameUsers.Contains(c.User.Name)).Select(c => { c.User.isInGame = false; return c; });
                                 //send to game users that their game is over and they should reset to lobby
                                 foreach (var user in currentGame.Users) await SendCompleteMessageAsync(user.Value.Socket, new DataTransmission<bool> { MessageType = "reset", Message = true });
-                                //send to everybody a (fake) login
+                                //send to everybody a (fake) login of everybody
                                 _handler.ForEach(async handler
                                     => await SendCompleteMessageAsync(handler.Socket, new DataTransmission<IEnumerable<string>> { MessageType = "login", Message = Users.Where(c => !c.isInGame).Select(c => c.Name) }));
                             }
@@ -240,7 +241,7 @@ namespace CheckersWS
         #endregion Private Methods
 
         #region Private Classes
-
+        //implementation of IEqualityComparere for User obj.
         private class UsersComparer : IEqualityComparer<User>
         {
             #region Public Methods

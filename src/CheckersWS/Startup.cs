@@ -38,8 +38,6 @@ namespace CheckersWS
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            var data = new DataTransmission<MoveValidation> { Message = new MoveValidation { GameState = Game.StateOfGame.GameOver, UpdateMove = true } };
-            Console.WriteLine(data.Message);
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto })
                .UseDefaultFiles()
                .UseStaticFiles()
