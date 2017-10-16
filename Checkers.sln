@@ -1,26 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{465B757C-2F75-4032-B433-7C3E49204F35}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{91AA191D-287A-406D-968F-D281284263E5}"
 	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
 		LICENSE = LICENSE
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CheckersWS", "src\CheckersWS\CheckersWS.xproj", "{6420EF15-1915-4762-A91C-633D7CBDB4CE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{3A413B14-4C13-45D6-8538-04DD35F3C6BB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckersWS", "src\CheckersWS\CheckersWS.csproj", "{6420EF15-1915-4762-A91C-633D7CBDB4CE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BD9BE092-857C-4993-A308-A70DA7C71D9A} = {BD9BE092-857C-4993-A308-A70DA7C71D9A}
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Checkers", "src\Checkers\Checkers.xproj", "{BD9BE092-857C-4993-A308-A70DA7C71D9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Checkers", "src\Checkers\Checkers.csproj", "{BD9BE092-857C-4993-A308-A70DA7C71D9A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{3A413B14-4C13-45D6-8538-04DD35F3C6BB}"
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CheckersTests", "CheckersTests\CheckersTests.xproj", "{DE2AB2BB-DF1A-49D0-B7A6-7380947953CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CheckersTests", "CheckersTests\CheckersTests.csproj", "{DE2AB2BB-DF1A-49D0-B7A6-7380947953CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,5 +47,8 @@ Global
 		{6420EF15-1915-4762-A91C-633D7CBDB4CE} = {465B757C-2F75-4032-B433-7C3E49204F35}
 		{BD9BE092-857C-4993-A308-A70DA7C71D9A} = {465B757C-2F75-4032-B433-7C3E49204F35}
 		{DE2AB2BB-DF1A-49D0-B7A6-7380947953CF} = {3A413B14-4C13-45D6-8538-04DD35F3C6BB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E476DAA7-0BCE-43F7-ADA0-236D9CC267E6}
 	EndGlobalSection
 EndGlobal
